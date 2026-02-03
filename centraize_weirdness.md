@@ -1,0 +1,1 @@
+## Keep edge cases and hacks in one place to reduce confusion.

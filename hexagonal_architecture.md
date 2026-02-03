@@ -1,0 +1,1 @@
+## Organize code so controllers manage input/output, services handle business logic, and repositories deal with database interactions.

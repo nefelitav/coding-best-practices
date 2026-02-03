@@ -1,0 +1,1 @@
+## Define interfaces for repositories to decouple usage from implementation and simplify transitions.

@@ -1,0 +1,1 @@
+## Design queries to retrieve all needed data at once, minimizing multiple round-trips.

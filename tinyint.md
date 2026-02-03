@@ -1,0 +1,1 @@
+## Although BOOLEAN is an alias, TINYINT(1) is clearer about storing 0 or 1.
