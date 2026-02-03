@@ -1,0 +1,1 @@
+## Start bool var with 'is' or 'has' to show it is bool

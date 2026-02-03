@@ -1,0 +1,1 @@
+## Avoid hardcoding to keep code flexible and easier to maintain.

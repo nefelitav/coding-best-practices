@@ -1,0 +1,1 @@
+## Assert against the entire array instead of individual items to catch unexpected additions. To check that an exception is thrown in a test and then assert more things, add a try catch and add assertions inside catch. At the end of try, add self::fail.

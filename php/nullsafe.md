@@ -1,0 +1,1 @@
+## Use the nullsafe operator (?->) to simplify conditional returns when accessing properties or methods on nullable objects.

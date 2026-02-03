@@ -1,0 +1,1 @@
+## Add a dry-run function to scripts to preview changes without executing them.

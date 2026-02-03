@@ -1,0 +1,1 @@
+## When adding a new column in a migration, place it after a specific column and update related indexes.
