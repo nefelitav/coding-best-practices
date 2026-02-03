@@ -1,0 +1,1 @@
+## Log errors to help with debugging and issue tracking.

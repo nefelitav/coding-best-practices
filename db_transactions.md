@@ -1,0 +1,1 @@
+## Use database transactions when multiple operations must succeed or fail as a single unit.

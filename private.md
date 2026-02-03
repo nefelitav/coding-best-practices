@@ -1,0 +1,1 @@
+## Make functions private if they shouldn’t be exposed outside the class. Place private functions at the bottom of the class for better readability.

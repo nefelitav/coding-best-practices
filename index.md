@@ -1,0 +1,1 @@
+## Join tables on indexed columns to speed up queries.

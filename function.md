@@ -1,0 +1,1 @@
+## Each function should have one clear responsibility for better maintainability.

@@ -1,0 +1,1 @@
+## Arrange functions and calls in the order they run to improve readability.

@@ -1,0 +1,1 @@
+## Always check the browser console for errors during development.

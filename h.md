@@ -1,0 +1,1 @@
+## Sanitize output using h() to prevent XSS attacks.
