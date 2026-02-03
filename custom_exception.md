@@ -1,0 +1,1 @@
+## Use custom exceptions to handle distinct error scenarios clearly.

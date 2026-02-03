@@ -1,0 +1,1 @@
+## Apply ternary operators for concise conditional expressions.

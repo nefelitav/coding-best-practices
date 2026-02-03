@@ -1,0 +1,1 @@
+## Use array_map to simplify array transformations and write cleaner code.

@@ -1,0 +1,1 @@
+## Use final to prevent a class from being extended or subclassed.

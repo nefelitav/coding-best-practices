@@ -1,0 +1,1 @@
+## Mark class properties as readonly to ensure immutability.

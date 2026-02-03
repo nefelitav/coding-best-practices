@@ -1,0 +1,1 @@
+## Always consider edge cases, like when data is null.

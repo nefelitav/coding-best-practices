@@ -1,0 +1,1 @@
+## Prefer assertSame over assertEquals for stricter type and value checks.

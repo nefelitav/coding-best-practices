@@ -1,0 +1,1 @@
+## When adding links in the frontend, use stable URLs that won’t change over time (e.g., Confluence share links).

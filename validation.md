@@ -1,0 +1,1 @@
+## Always validate user input to ensure data integrity and security.

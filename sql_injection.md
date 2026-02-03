@@ -1,0 +1,1 @@
+## Use parameters in SQL queries to prevent SQL injection.

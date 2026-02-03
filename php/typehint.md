@@ -1,0 +1,1 @@
+## Use type hints to improve code clarity and catch errors early.

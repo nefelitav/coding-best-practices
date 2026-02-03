@@ -1,0 +1,1 @@
+## Prefer assertTrue/assertFalse for boolean assertions over assertSame.

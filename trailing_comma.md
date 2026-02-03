@@ -1,0 +1,1 @@
+## Add trailing commas for cleaner diffs and easier code edits.

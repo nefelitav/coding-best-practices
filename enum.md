@@ -1,0 +1,1 @@
+## Use enums to manage tabs and legal URLs consistently.
