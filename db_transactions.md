@@ -1,1 +1,1 @@
-## Use database transactions when multiple operations must succeed or fail as a single unit.
+## Use database transactions when multiple operations must succeed or fail as a single unit. Keep the db transaction as light as possible.

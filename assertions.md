@@ -1,0 +1,1 @@
+## Use assertions to check internal preconditions.

@@ -1,1 +1,1 @@
-## Add comments only to explain complex or non-obvious code.
+## Add comments only to explain complex or non-obvious code. If the code needs comments, it's likely not good enough.
