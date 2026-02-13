@@ -1,0 +1,1 @@
+## If business rules depend on status and transitions are restricted, model them explicitly, not as strings or flags.

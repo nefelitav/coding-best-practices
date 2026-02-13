@@ -1,1 +1,1 @@
-## Use enums to manage tabs and legal URLs consistently.
+## Use enums to manage different options. Cleaner than using strings.

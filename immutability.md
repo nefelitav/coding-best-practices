@@ -1,0 +1,1 @@
+## Domain objects should be immutable by default. State changes must happen through explicit methods that return new instances. Mutability is very dangerous!

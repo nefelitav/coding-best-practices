@@ -1,0 +1,1 @@
+## Repositories must hide persistence implementation details and return domain objects, not persistence models. Hydrate models.
