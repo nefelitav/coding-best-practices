@@ -1,0 +1,1 @@
+## Always run EXPLAIN (or EXPLAIN ANALYZE) before optimizing a query, and don’t trust it’s fast unless you confirm the plan uses the right index and scans as few rows as possible.

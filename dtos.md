@@ -1,0 +1,1 @@
+## Use DTOs when crossing boundaries (API, service, or persistence layers) to control exactly what data is exposed, decouple your domain model, and prevent leaking internal implementation details.
