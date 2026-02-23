@@ -1,1 +1,1 @@
-## Use database transactions when multiple operations must succeed or fail as a single unit. Keep the db transaction as light as possible.
+## Use database transactions when multiple operations must succeed or fail as a single unit. Keep the db transaction as light as possible. Add assertion for code that should only be inside a db transaction.
