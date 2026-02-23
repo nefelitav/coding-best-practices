@@ -1,1 +1,0 @@
-## Freeze time in tests to ensure consistent, predictable results.
