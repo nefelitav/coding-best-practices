@@ -1,0 +1,1 @@
+## CODEOWNERS ensures the right people automatically review changes, improving code quality and accountability. Define CODEOWNERS by mapping clear, minimal path patterns to the smallest responsible team (not individuals), keep the file ordered from most-specific to least-specific rules, and review it regularly to reflect ownership changes.

@@ -1,0 +1,1 @@
+## Always use shared date format constants (such as DateFormat::*) instead of hard-coded date format strings to ensure consistency, correctness, and maintainability across the codebase.

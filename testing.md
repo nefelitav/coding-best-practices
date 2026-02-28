@@ -25,3 +25,5 @@
 ## Do not pass ORM models between test helpers. Fixtures, Processes, and Assertions should query repositories themselves. This keeps tests closer to real production behavior and avoids leaking implementation details.
 
 ## Freeze time in tests to ensure consistent, predictable results.
+
+## Use data providers only to test meaningful variations of the same behavior, keep the data minimal and clearly named, and ensure failures can be traced to a specific data set.
