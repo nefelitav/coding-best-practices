@@ -1,0 +1,1 @@
+## Avoid Boolean Parameters: Replace ambiguous booleans (e.g., $enabled = true) with descriptive actions (e.g., activate(), deactivate()). This makes method calls self-explanatory and improves readability.

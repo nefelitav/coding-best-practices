@@ -1,0 +1,1 @@
+## Avoid Magic Numbers: Never hardcode numeric values without context; define constants with meaningful names. This improves readability and maintainability.
