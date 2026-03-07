@@ -17,6 +17,19 @@ Assert: Verify the result
 
 **Example:**
 ```php
+// ❌ BAD: Multiple behaviors in one test
+public function testUserFunctionality(): void {
+    $user = new User();
+    $user->name = 'John';
+    $this->assertEquals('John', $user->name);
+    
+    $user->suspend();
+    $this->assertEquals('suspended', $user->status);
+    
+    $user->resume();
+    $this->assertEquals('active', $user->status);
+}
+    
 // ✅ GOOD: Clear structure
 public function testUserCanBeSuspended(): void {
     // Arrange
@@ -29,19 +42,6 @@ public function testUserCanBeSuspended(): void {
     // Assert
     $this->assertEquals('suspended', $suspendedUser->status);
     $this->assertEquals('Spam', $suspendedUser->suspension_reason);
-}
-
-// ❌ BAD: Multiple behaviors in one test
-public function testUserFunctionality(): void {
-    $user = new User();
-    $user->name = 'John';
-    $this->assertEquals('John', $user->name);
-    
-    $user->suspend();
-    $this->assertEquals('suspended', $user->status);
-    
-    $user->resume();
-    $this->assertEquals('active', $user->status);
 }
 ```
 

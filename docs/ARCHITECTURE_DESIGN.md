@@ -1,3 +1,17 @@
+# Architecture & Design
+
+Build systems that are modular, testable, and easy to evolve.
+
+---
+
+## 1. Hexagonal Architecture (Ports and Adapters)
+
+Organize code so controllers manage input/output, services handle business logic, and repositories deal with persistence.
+
+**Example:**
+```php
+class UserController {
+    public function store(Request $request): Response {
         $user = $this->service->execute($request->toCommand());
         return response('User created', 201);
     }
@@ -16,8 +30,8 @@ class UserRepository {
     public function save(User $user): void {
         DB::insert('users', $this->hydrate($user));
     }
-    
-    // repository returns domain objects, not raw data, for safety
+
+    // Repository returns domain objects, not raw data, for safety
     private function hydrate(User $user): array {
         return ['name' => $user->name, 'email' => $user->email];
     }
@@ -416,4 +430,3 @@ $user = new User(role: UserRole::ADMIN);  // Works
 | **Immutability** | Accidental mutations | Use readonly + factory methods |
 | **State Machine** | Invalid state transitions | Model states explicitly |
 | **Enums** | String magic | Type-safe enum values |
-

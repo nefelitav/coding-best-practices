@@ -211,7 +211,6 @@ Before shipping code that touches the database:
 - [ ] Transaction scope is minimal and focused
 - [ ] Indexes are created for foreign keys and WHERE clauses
 - [ ] No redundant data storage
-- [ ] Long-running operations happen outside transactions
 
 ---
 

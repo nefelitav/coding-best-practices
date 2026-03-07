@@ -575,6 +575,249 @@ public function getUser(int $id): User {
 
 ---
 
+## 21. Type Hints
+
+Use type hints for parameters and return values to improve clarity and catch errors early.
+
+**Example:**
+```php
+// ❌ BAD: No type hints
+function calculateTotal($items, $taxRate) {
+    $total = 0;
+    foreach ($items as $item) {
+        $total += $item['price'] * $item['quantity'];
+    }
+    return $total * (1 + $taxRate);
+}
+
+// ✅ GOOD: Type hints make intent explicit
+/**
+* @param array<Item> $items
+ */
+function calculateTotal(array $items, float $taxRate): float {
+    $total = 0.0;
+    foreach ($items as $item) {
+        $total += $item['price'] * $item['quantity'];
+    }
+    return $total * (1 + $taxRate);
+}
+```
+
+---
+
+## 22. Array Transformations with array_map
+
+Use `array_map()` to simplify array transformations and reduce boilerplate loops.
+
+**Example:**
+```php
+// ❌ BAD: Manual loop
+$userNames = [];
+foreach ($users as $user) {
+    $userNames[] = $user->getName();
+}
+
+// ✅ GOOD: array_map
+$userNames = array_map(fn($user) => $user->getName(), $users);
+
+// ✅ GOOD: Transform into new structure
+$orderSummaries = array_map(
+    fn($order) => [
+        'id' => $order->id,
+        'total' => $order->calculateTotal(),
+    ],
+    $orders
+);
+```
+
+---
+
+## 23. Avoid Tuples
+
+Avoid tuples because they are not well typed. Use DTOs with named fields instead.
+
+**Example:**
+```php
+// ❌ BAD: Tuple-style array return
+function getUserInfo(int $id): array {
+    return ['John', 'john@example.com', 25];
+}
+
+[$name, $email, $age] = getUserInfo(1); // Easy to mix up
+
+// ✅ GOOD: DTO with named properties
+final class UserInfo {
+    public function __construct(
+        public readonly string $name,
+        public readonly string $email,
+        public readonly int $age,
+    ) {}
+}
+
+function getUserInfo(int $id): UserInfo {
+    return new UserInfo('John', 'john@example.com', 25);
+}
+```
+
+---
+
+## 24. Centralize Edge Cases and Hacks
+
+Keep edge cases and hacks in one place to reduce confusion and make cleanup easy.
+
+**Example:**
+```php
+// ✅ GOOD: Centralized workaround
+final class PaymentProcessorFactory {
+    public function __construct(
+        private LegacyPaymentProcessor $legacy,
+        private StripePaymentProcessor $stripe,
+    ) {}
+
+    // WORKAROUND: Legacy accounts cannot use Stripe (remove after migration)
+    public function forAccount(Account $account): PaymentProcessor {
+        if ($account->isLegacy()) {
+            return $this->legacy;
+        }
+
+        return $this->stripe;
+    }
+}
+```
+
+---
+
+## 25. Prefer Company-Built Custom Functions
+
+Prefer company-built helper functions over reimplementing the same logic.
+
+**Example:**
+```php
+// ❌ BAD: Reinventing behavior in every file
+$slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+
+// ✅ GOOD: Use shared helper
+$slug = App\Support\Strings::slug($name);
+
+// ✅ GOOD: Shared helper keeps rules consistent
+$title = App\Support\Strings::titleCase($rawTitle);
+```
+
+---
+
+## 26. Data Seeds
+
+Use data seeds to populate the database with initial or test data.
+
+**Example:**
+```php
+// ✅ GOOD: Seed data for local/dev
+final class UserSeeder extends Seeder {
+    public function run(): void {
+        User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'role' => UserRole::ADMIN,
+        ]);
+    }
+}
+```
+
+---
+
+## 27. Shared Date Format Constants
+
+Always use shared date format constants instead of hard-coded strings.
+
+**Example:**
+```php
+final class DateFormat {
+    public const DATETIME = 'Y-m-d H:i:s';
+    public const DATE = 'Y-m-d';
+    public const DISPLAY = 'd/m/Y';
+}
+
+// ✅ GOOD: Consistent formats everywhere
+echo $user->created_at->format(DateFormat::DATETIME);
+```
+
+---
+
+## 28. Use TINYINT(1) for Booleans
+
+Although BOOLEAN is an alias, `TINYINT(1)` is clearer about storing 0 or 1.
+
+**Example:**
+```sql
+-- ✅ GOOD: Explicit numeric boolean
+ALTER TABLE users
+    ADD is_active TINYINT(1) NOT NULL DEFAULT 1;
+```
+
+---
+
+## 29. Logging
+
+Log errors to help with debugging and issue tracking.
+
+**Example:**
+```php
+try {
+    $this->paymentGateway->charge($order);
+} catch (PaymentException $e) {
+    Log::error('Payment failed', [
+        'order_id' => $order->id,
+        'reason' => $e->getMessage(),
+    ]);
+    throw $e;
+}
+```
+
+---
+
+## 30. Browser Console Checks
+
+Always check the browser console for errors during development.
+
+**Example:**
+```js
+// ✅ GOOD: Log unexpected states during development
+if (!window.currentUser) {
+    console.error('Missing current user payload');
+}
+```
+
+---
+
+## 31. Stable URLs in Frontend
+
+When adding links in the frontend, use stable URLs that will not change over time.
+
+**Example:**
+```html
+<!-- ❌ BAD: Brittle link that can change -->
+<a href="https://confluence.example.com/display/PROJ/Page+Name">Docs</a>
+
+<!-- ✅ GOOD: Stable share link -->
+<a href="https://confluence.example.com/x/AbCdEf">Docs</a>
+```
+
+---
+
+## 32. CODEOWNERS
+
+Use CODEOWNERS to ensure the right people review changes for critical areas.
+
+**Example:**
+```
+# .github/CODEOWNERS
+/docs/      @platform-team
+/src/api/   @api-team
+/src/payments/ @payments-team
+```
+
+---
+
 ## Quick Reference
 
 | Pattern | Problem | Solution |
@@ -598,4 +841,15 @@ public function getUser(int $id): User {
 | **Hardcoding** | Inflexible code | Use configuration |
 | **Custom Exceptions** | Generic errors | Create specific exception types |
 | **Exception Handling** | Control flow abuse | Reserve for exceptional cases |
-
+| **Type Hints** | Unclear parameter/return types | Use explicit type hints |
+| **array_map** | Manual array transformations | Use array_map for clarity |
+| **Tuples** | Poorly typed data | Use DTOs with named fields |
+| **Edge Cases** | Spread out hacks/workarounds | Centralize in one place |
+| **Custom Functions** | Reinventing the wheel | Use company-built helpers |
+| **Data Seeds** | Missing test data | Use seeds to populate data |
+| **Date Formats** | Inconsistent date formats | Use shared date format constants |
+| **Booleans** | Using BOOLEAN type | Use TINYINT(1) for clarity |
+| **Logging** | Untracked errors | Log errors with context |
+| **Console Checks** | Ignoring frontend errors | Check and log browser console errors |
+| **Stable URLs** | Fragile links | Use stable, unchanging URLs |
+| **CODEOWNERS** | Unclear code ownership | Define code ownership for reviews |
