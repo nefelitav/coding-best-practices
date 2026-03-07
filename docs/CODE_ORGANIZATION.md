@@ -55,7 +55,7 @@ private function logOrderProcessed(int $orderId): void {
 
 ## 2. Function/Method Ordering
 
-Arrange functions and calls in the order they run to improve readability.
+Arrange functions and calls in the order they run to improve readability. It's not a very strict rule, but it can help readers follow the flow of execution.
 
 **Pattern:**
 ```php

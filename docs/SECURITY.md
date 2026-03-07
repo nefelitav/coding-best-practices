@@ -472,16 +472,6 @@ final class UserRegistrationService
 
 ---
 
-## 🚀 Next Steps
-
-Master security? Continue learning:
-
-1. **[Input Validation](./VALIDATION.md)** - Deep dive into validation
-2. **[Error Handling](./ERROR_HANDLING.md)** - Handle errors without leaking info
-3. **[Testing](./TESTING_BASICS.md)** - Test your security measures
-
----
-
 ## 📋 Security Quick Reference
 
 | Attack | Defense | Example |
@@ -500,8 +490,3 @@ Master security? Continue learning:
 One security hole = entire app compromised = customer data stolen = company sued = your reputation destroyed.
 
 **No excuses. Secure your code.** 🔒
-
----
-
-**Next**: [Error Handling](./ERROR_HANDLING.md) | **Challenge**: [Security Challenge](../challenges/CHALLENGE_SECURITY.md)
-

@@ -1,4 +1,4 @@
-# A Practical Starter for Junior Software Engineers
+# The Junior Engineer’s Guide to Coding Best Practices
 
 > Short, focused guidance for junior software engineers who want to learn core coding practices.
 
@@ -6,14 +6,19 @@
 
 ## Why This Repo?
 
-This repository is a **starter guide for junior engineers**. It focuses on the basics that matter most:
+This repository is a **starter guide for junior engineers**. It's about all the small things that make a big difference:
 
 - Write clear, maintainable code
 - Avoid common bugs
 - Write simple, reliable tests
 - Keep code secure
 
+Clean coding practices can also help AI coding assistants like Copilot give better, more reliable suggestions, training both you and the AI to write accurate, maintainable, and secure code.
+
+I decided to document the lessons I got from my first few years as a software engineer in a way that’s easy to understand and apply. This is not an exhaustive guide to software engineering, but it covers the core practices that will help you write better code and grow as a developer.
+
 ---
+
 
 ## Main Learning Guides
 
