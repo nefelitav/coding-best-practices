@@ -1,45 +1,3 @@
-# Architecture & Design
-
-Solid architectural patterns make code scalable, testable, and maintainable.
-
----
-
-## 1. Hexagonal Architecture (Ports & Adapters)
-
-Organize code into layers: controllers manage input/output, services handle business logic, repositories deal with database interactions.
-
-**Benefits:**
-- Clear separation of concerns
-- Easy to test (swap implementations)
-- Easy to change databases
-- Business logic doesn't depend on frameworks
-
-**Pattern:**
-```
-Controller (input/output)
-    ↓
-Service (business logic)
-    ↓
-Repository (data persistence)
-```
-
-**Example:**
-```php
-// ❌ BAD: Controller mixed with logic
-class UserController {
-    public function create() {
-        $user = new User($_POST['name'], $_POST['email']);
-        DB::insert('users', $user->toArray());
-        Mail::send($user->email, 'Welcome!');
-        return response('User created');
-    }
-}
-
-// ✅ GOOD: Clear separation
-class UserController {
-    public function __construct(private CreateUserService $service) {}
-    
-    public function create(CreateUserRequest $request) {
         $user = $this->service->execute($request->toCommand());
         return response('User created', 201);
     }
@@ -59,6 +17,7 @@ class UserRepository {
         DB::insert('users', $this->hydrate($user));
     }
     
+    // repository returns domain objects, not raw data, for safety
     private function hydrate(User $user): array {
         return ['name' => $user->name, 'email' => $user->email];
     }
@@ -73,7 +32,7 @@ Use DTOs when crossing boundaries (API, service, or persistence layers) to contr
 
 **Example:**
 ```php
-// ❌ BAD: Exposing internal domain object directly
+// ❌ NOT IDEAL: Exposing internal domain object directly (leaking implementation details, like id)
 class UserRepository {
     public function findById(int $id): UserModel {}
 }
@@ -204,56 +163,10 @@ $user = $service->getUser(1);  // Uses fake, not real database
 
 ---
 
-## 4. Repositories & Hydration
-
-Repositories must hide persistence implementation details and return domain objects, not persistence models. Hydrate models carefully.
-
-**Rules:**
-- Never return raw database records
-- Hydrate models with only domain data
-- Repository methods describe business operations, not queries
-
-**Example:**
-```php
-// ❌ BAD: Returning database array
-class UserRepository {
-    public function find($id): array {
-        return DB::query("SELECT * FROM users WHERE id = ?", [$id]);
-    }
-}
-
-// ✅ GOOD: Return domain objects, hide implementation
-class UserRepository {
-    public function find($id): ?User {
-        $row = DB::query("SELECT * FROM users WHERE id = ?", [$id]);
-        return $row ? $this->hydrate($row) : null;
-    }
-    
-    private function hydrate(array $row): User {
-        return new User(
-            id: $row['id'],
-            name: $row['name'],
-            email: $row['email'],
-        );
-    }
-}
-
-// Business-focused method names
-class OrderRepository {
-    public function findByCustomer(int $customerId): array {
-        return array_map(
-            fn($row) => $this->hydrate($row),
-            DB::query("SELECT * FROM orders WHERE customer_id = ?", [$customerId])
-        );
-    }
-}
-```
-
----
-
 ## 5. Interfaces for Repositories
 
 Define interfaces for repositories to decouple usage from implementation and simplify transitions.
+Useful for testing (mocking) and future-proofing against changes in data storage.
 
 **Example:**
 ```php
@@ -291,6 +204,7 @@ class InMemoryUserRepository implements UserRepositoryInterface {
 ## 6. Immutability
 
 Domain objects should be immutable by default. State changes must happen through explicit methods that return new instances.
+Mutability can be dangerous - it's easy to accidentally change state and cause bugs, because you don't know at what point in the code the object has its fields set.
 
 **Example:**
 ```php
@@ -304,6 +218,10 @@ class Product {
         $this->name = $name;
         $this->price = $price;
         $this->quantity = $quantity;
+    }
+    
+    public function setName(string $name): void {
+        $this->name = $name;
     }
 }
 

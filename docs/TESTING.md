@@ -124,6 +124,7 @@ public function testSuspensionThrowsExceptionAndLogsError(): void {
 }
 
 // Alternative: Using PHPUnit's built-in methods
+// But then you don't get to assert e.g. that nothing was persisted
 public function testSuspensionThrows(): void {
     $this->expectException(InvalidArgumentException::class);
     $this->expectExceptionMessage('Reason cannot be empty');
