@@ -15,10 +15,14 @@ This repository is a **starter guide for junior engineers**. It's about all the 
 
 Clean coding practices can also help AI coding assistants like Copilot give better, more reliable suggestions, training both you and the AI to write accurate, maintainable, and secure code.
 
-I decided to document the lessons I got from my first few years as a software engineer in a way that’s easy to understand and apply. This is not an exhaustive guide to software engineering, but it covers the core practices that will help you write better code and grow as a developer.
-
 ---
+## About This Guide
 
+I created this repository to document the lessons I learned during my first few years as a software engineer, presented in a way that is easy to understand and immediately applicable.
+
+This isn’t an exhaustive guide to software engineering. Instead, it focuses on core practices that consistently improve code quality and help junior developers grow faster and write better software.
+
+--- 
 
 ## Main Learning Guides
 

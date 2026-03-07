@@ -278,6 +278,29 @@ echo $allowedHtml;
 
 ---
 
+## ⚠️ PHP Dangerous Functions
+
+Avoid executing risky PHP functions that can run system commands or arbitrary code.
+
+**Avoid:**
+```php
+exec($cmd);
+shell_exec($cmd);
+system($cmd);
+passthru($cmd);
+proc_open($cmd, $descriptors, $pipes);
+popen($cmd, 'r');
+eval($code);
+create_function($code);
+```
+
+**Rules:**
+- ✅ Disable these in production via `disable_functions`
+- ✅ Never pass user input to system calls
+- ✅ Prefer safe, library-provided APIs
+
+---
+
 ## 🚨 Attack #3: Unvalidated Input
 
 ### The Problem
