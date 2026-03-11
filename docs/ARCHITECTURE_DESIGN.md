@@ -4,7 +4,7 @@ Build systems that are modular, testable, and easy to evolve.
 
 ---
 
-## 1. Hexagonal Architecture (Ports and Adapters)
+## 1. Hexagonal Architecture
 
 Organize code so controllers manage input/output, services handle business logic, and repositories deal with persistence.
 
@@ -42,7 +42,7 @@ class UserRepository {
 
 ## 2. DTOs (Data Transfer Objects)
 
-Use DTOs when crossing boundaries (API, service, or persistence layers) to control what data is exposed and prevent leaking internal implementation details.
+Use DTOs when crossing boundaries to control what data is exposed and prevent leaking internal implementation details.
 
 **Example:**
 ```php
@@ -110,12 +110,11 @@ class UserRepository {
     }
 }
 
-// Usage
-// For display - use DTO
+// For display use DTO
 $userDTO = $this->userRepository->findForDisplay($id);
 return view('user.profile', ['user' => $userDTO]);
 
-// For business logic - use Model
+// For business logic use Model
 $user = $this->userRepository->findForUpdate($id);
 $user->suspend(); // Domain method
 $this->userRepository->save($user);
@@ -418,6 +417,57 @@ $user = new User(role: UserRole::ADMIN);  // Works
 
 ---
 
+## 9. Data Normalization
+
+### Rule: Avoid storing the same information in multiple places
+
+Prevent errors during insert, update, or delete by normalizing data. Redundant data can drift and become inconsistent.
+
+**Example:**
+```php
+// ❌ BAD: Denormalized (duplicate data)
+CREATE TABLE orders (
+    id INT,
+    customer_name VARCHAR(255), -- ❌ Duplicated from customers table
+    customer_email VARCHAR(255), -- ❌ Duplicated from customers table
+    total DECIMAL(10, 2),
+    customer_calculated_total DECIMAL(10, 2) -- ❌ Duplicated (can drift!)
+);
+
+// If customer name changes, must update everywhere!
+// If calculation changes, must recalculate everywhere!
+// Easy to have stale/inconsistent data
+
+// ✅ GOOD: Normalized
+CREATE TABLE customers (
+    id INT PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+);
+
+CREATE TABLE orders (
+    id INT PRIMARY KEY,
+    customer_id INT,
+    total DECIMAL(10, 2),
+    created_at TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+// Query joins to get data, always up-to-date
+SELECT o.id, c.name, c.email, o.total 
+FROM orders o
+JOIN customers c ON o.customer_id = c.id;
+```
+
+**Benefits:**
+- ✅ Single source of truth for each piece of data
+- ✅ No duplicate data to keep in sync
+- ✅ Updates are atomic and consistent
+- ✅ Less storage space
+- ✅ Easier to maintain
+
+---
+
 ## Quick Reference
 
 | Pattern | Problem | Solution |
@@ -430,3 +480,4 @@ $user = new User(role: UserRole::ADMIN);  // Works
 | **Immutability** | Accidental mutations | Use readonly + factory methods |
 | **State Machine** | Invalid state transitions | Model states explicitly |
 | **Enums** | String magic | Type-safe enum values |
+| **Normalization** | Duplicate data | Single source of truth per piece of data |

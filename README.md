@@ -16,34 +16,10 @@ Clean coding practices can also help AI coding assistants like Copilot give bett
 
 ## Main Learning Guides
 
-| Guide | Best For |
-|-------|----------|
-| [Code Organization](./docs/CODE_ORGANIZATION.md) | Learning clean code basics | 
-| [Architecture & Design](./docs/ARCHITECTURE_DESIGN.md) | Understanding system design | 
-| [Testing](./docs/TESTING.md) | Writing tests that work | 
-| [Security](./docs/SECURITY.md) | Protecting your app |
-| [Performance](./docs/PERFORMANCE.md) | Making queries fast |
-
----
-
-## Interactive Challenges
-
-Test your knowledge:
-
-### Challenge #1: Messy Function
-```php
-function processUserData($data) {
-    $user = DB::query("SELECT * FROM users WHERE id = " . $data['id']);
-    if ($user) {
-        $user['name'] = $data['name'];
-        DB::query("UPDATE users SET name = '" . $data['name'] . "' WHERE id = " . $data['id']);
-        Mail::send($user['email'], "Profile Updated");
-        Log::info("Updated user " . $data['id']);
-        return true;
-    }
-    return false;
-}
-```
-
-How many issues can you find? [See the solution](./docs/challenges/CHALLENGE_01.md)
-
+| Guide | Best For               |
+|-------|------------------------|
+| [Code Organization](./docs/CODE_ORGANIZATION.md) | Code basics            | 
+| [Architecture & Design](./docs/ARCHITECTURE_DESIGN.md) | Architecture practices | 
+| [Testing](./docs/TESTING.md) | Testing practices      | 
+| [Security](./docs/SECURITY.md) | Security practices     |
+| [Performance](./docs/PERFORMANCE.md) | Performance practices  |
