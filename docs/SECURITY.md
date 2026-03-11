@@ -182,10 +182,10 @@ function h(string $text): string {
 }
 
 // Converts dangerous characters:
-// < becomes &lt;
-// > becomes &gt;
-// " becomes &quot;
-// ' becomes &#039;
+// < becomes "&lt";
+// > becomes "&gt";
+// " becomes "&quot";
+// ' becomes "&#039";
 ```
 
 ---
@@ -487,14 +487,6 @@ final class UserRegistrationService
 
 ---
 
-## 📚 Security Resources
-
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/) - Most critical web security risks
-- [PHP Security Guide](https://www.php.net/manual/en/security.php) - Official PHP security docs
-- [PortSwigger Web Security Academy](https://portswigger.net/web-security) - Free security training
-
----
-
 ## 📋 Security Quick Reference
 
 | Attack | Defense | Example |
@@ -503,13 +495,3 @@ final class UserRegistrationService
 | XSS | Sanitize output with `h()` | `echo h($userInput)` |
 | Bad Input | Validate everything | `filter_var($email, FILTER_VALIDATE_EMAIL)` |
 | Weak Passwords | Hash with bcrypt | `password_hash($pwd, PASSWORD_BCRYPT)` |
-
----
-
-## 🎓 Remember
-
-**Security is not optional.** These aren't "nice to have" practices - they're MANDATORY.
-
-One security hole = entire app compromised = customer data stolen = company sued = your reputation destroyed.
-
-**No excuses. Secure your code.** 🔒

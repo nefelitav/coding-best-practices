@@ -503,6 +503,12 @@ Use data providers only to test meaningful variations of the same behavior. Keep
 
 **Example:**
 ```php
+// ❌ BAD: Excessive data variations
+#[DataProvider('randomTestData')]
+public function testSomething($a, $b, $c, $d, $e, $f): void {
+    // Hard to understand what each variation tests
+}
+
 // ✅ GOOD: Meaningful variations with clear data
 #[DataProvider('validEmailProvider')]
 public function testValidEmailsAreAccepted(string $email): void {
@@ -528,12 +534,6 @@ public static function invalidEmailProvider(): array {
         'missing user' => ['@example.com'],
         'no at symbol' => ['userexample.com'],
     ];
-}
-
-// ❌ BAD: Excessive data variations
-#[DataProvider('randomTestData')]
-public function testSomething($a, $b, $c, $d, $e, $f): void {
-    // Hard to understand what each variation tests
 }
 ```
 

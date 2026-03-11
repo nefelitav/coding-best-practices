@@ -6,23 +6,36 @@ Write fast code that scales as your business grows.
 
 ## 1. Database Indexes
 
-### Rule: Join tables on indexed columns
+### Rule: Use indexes on columns that are frequently filtered or joined
 
-Speed up queries dramatically by joining on indexed columns.
+Indexes dramatically speed up queries by avoiding full table scans.
 
 **Example:**
 ```php
-// ❌ BAD: No indexes
-SELECT * FROM orders 
-WHERE user_id = ? AND created_at > ?; // Scans all rows
+// ❌ BAD: No index on frequently queried column
+SELECT * FROM orders WHERE customer_id = ?; // Scans all rows
 
-// ✅ GOOD: Add indexes
-ALTER TABLE orders ADD INDEX idx_user_created (user_id, created_at);
+// ✅ GOOD: Add index
+ALTER TABLE orders ADD INDEX idx_customer_id (customer_id);
+SELECT * FROM orders WHERE customer_id = ?; // Uses index, fast!
 
-// Query becomes fast (uses index)
+// ✅ GOOD: Composite index for common WHERE + ORDER BY patterns
+ALTER TABLE orders ADD INDEX idx_customer_created (customer_id, created_at);
 SELECT * FROM orders 
-WHERE user_id = ? AND created_at > ?;
+WHERE customer_id = ? AND created_at > ? 
+ORDER BY created_at DESC; // Uses composite index
 ```
+
+**When to index:**
+- Foreign key columns (for JOINs)
+- Columns used in WHERE clauses
+- Columns used in ORDER BY
+- Columns used in GROUP BY
+
+**When NOT to index:**
+- Low-cardinality columns (too many duplicate values)
+- Columns that are rarely queried
+- Small tables (index overhead not worth it)
 
 ---
 
@@ -125,81 +138,6 @@ $order = DB::transaction(function() use ($customer) {
 
 ---
 
-## 5. Database Migrations
-
-### Rule: Place new columns after specific columns and update indexes
-
-Think carefully about column placement and indexes when migrating.
-
-**Example:**
-```php
-// ✅ GOOD: Strategic column placement
-Schema::table('orders', function (Blueprint $table) {
-    // Add new column after 'customer_id'
-    $table->string('tracking_number')->after('customer_id')->index();
-    
-    // Update composite index
-    $table->index(['customer_id', 'tracking_number']);
-});
-
-// ❌ BAD: Adds column at end, breaks performance
-Schema::table('orders', function (Blueprint $table) {
-    $table->string('tracking_number'); // Added at end, index may be inefficient
-});
-
-// ✅ GOOD: Add covering index
-Schema::table('orders', function (Blueprint $table) {
-    // Index includes both lookup and data columns
-    $table->index(['customer_id', 'created_at', 'total']);
-});
-```
-
----
-
-## 6. Data Normalization
-
-### Rule: Avoid storing the same information in multiple places
-
-Prevent errors during insert, update, or delete by normalizing data.
-
-**Example:**
-```php
-// ❌ BAD: Denormalized (duplicate data)
-CREATE TABLE orders (
-    id INT,
-    customer_name VARCHAR(255), -- ❌ Duplicated from customers table
-    customer_email VARCHAR(255), -- ❌ Duplicated from customers table
-    total DECIMAL(10, 2),
-    customer_calculated_total DECIMAL(10, 2) -- ❌ Duplicated (can drift!)
-);
-
-// If customer name changes, must update everywhere!
-// If calculation changes, must recalculate everywhere!
-// Easy to have stale/inconsistent data
-
-// ✅ GOOD: Normalized
-CREATE TABLE customers (
-    id INT PRIMARY KEY,
-    name VARCHAR(255),
-    email VARCHAR(255),
-);
-
-CREATE TABLE orders (
-    id INT PRIMARY KEY,
-    customer_id INT,
-    total DECIMAL(10, 2),
-    created_at TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES customers(id)
-);
-
-// Query joins to get data, always up-to-date
-SELECT o.id, c.name, c.email, o.total 
-FROM orders o
-JOIN customers c ON o.customer_id = c.id;
-```
-
----
-
 ## Performance Checklist
 
 Before shipping code that touches the database:
@@ -210,7 +148,6 @@ Before shipping code that touches the database:
 - [ ] Batch operations use WHERE IN instead of looping
 - [ ] Transaction scope is minimal and focused
 - [ ] Indexes are created for foreign keys and WHERE clauses
-- [ ] No redundant data storage
 
 ---
 
@@ -222,7 +159,5 @@ Before shipping code that touches the database:
 | **Unknown Query Plan** | Assume it's fast | Run `EXPLAIN` first |
 | **N+1 Queries** | Load each item separately | Eager load or batch fetch |
 | **Long Transactions** | Tables locked too long | Keep transactions minimal |
-| **No Index Strategy** | Random performance | Plan indexes during migration |
-| **Duplicate Data** | Inconsistency | Normalize relationships |
-| **No Analysis** | Slow without knowing why | Use `EXPLAIN ANALYZE` |
+
 
