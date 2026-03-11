@@ -4,23 +4,13 @@
 
 ---
 
-## Why This Repo?
-
-This repository is a **starter guide for junior engineers**. It's about all the small things that make a big difference:
-
-- Write clear, maintainable code
-- Avoid common bugs
-- Write simple, reliable tests
-- Keep code secure
-
-Clean coding practices can also help AI coding assistants like Copilot give better, more reliable suggestions, training both you and the AI to write accurate, maintainable, and secure code.
-
----
 ## About This Guide
+
+This repository is a **starter guide for junior engineers**. It's about all the small things that make a big difference.
 
 I created this repository to document the lessons I learned during my first few years as a software engineer, presented in a way that is easy to understand and immediately applicable.
 
-This isn’t an exhaustive guide to software engineering. Instead, it focuses on core practices that consistently improve code quality and help junior developers grow faster and write better software.
+Clean coding practices can also help AI coding assistants like Copilot give better, more reliable suggestions, training both you and the AI to write accurate, maintainable, and secure code.
 
 --- 
 
