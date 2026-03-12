@@ -1,20 +1,10 @@
 # Security Essentials
 
-Don't get hacked. Follow these essential practices that EVERY developer must know.
+Don't get hacked, follow these essential practices.
 
 ---
 
-## ⚠️ The Three Rules You MUST Follow
-
-1. **Never trust user input** - EVER
-2. **Always validate and sanitize** - No exceptions
-3. **Use parameterized queries** - Always, no matter what
-
-Break these rules? Your app WILL be hacked.
-
----
-
-## 🚨 Attack #1: SQL Injection
+## 1. SQL Injection
 
 ### How It Works
 
@@ -74,7 +64,7 @@ $user = DB::table('users')
     ->first();
 ```
 
-**Option 3: Use a Repository Pattern**
+**Option 3: Use a Repository Pattern (if outside the repository)**
 ```php
 // Best practice - hide the DB completely
 $user = $this->userRepository->findByEmail($email);
@@ -82,57 +72,7 @@ $user = $this->userRepository->findByEmail($email);
 
 ---
 
-### 🎯 Practice: Spot the Vulnerabilities
-
-Find the SQL injection vulnerabilities:
-
-```php
-function searchProducts($searchTerm, $category) {
-    // Query 1
-    $query1 = "SELECT * FROM products WHERE name LIKE '%" . $searchTerm . "%'";
-    
-    // Query 2
-    $query2 = "SELECT * FROM products WHERE category = ?";
-    $results2 = DB::query($query2, [$category]);
-    
-    // Query 3
-    $query3 = "SELECT * FROM products WHERE price < " . $_GET['maxPrice'];
-    
-    return DB::query($query1);
-}
-```
-
-<details>
-<summary>🎯 Show answer</summary>
-
-**Vulnerabilities:**
-- ❌ Query 1: Uses string concatenation with `$searchTerm`
-- ✅ Query 2: Safe! Uses parameterized query
-- ❌ Query 3: Uses string concatenation with `$_GET['maxPrice']`
-
-**Fixed version:**
-```php
-function searchProducts(string $searchTerm, string $category, float $maxPrice): array {
-    $query = "
-        SELECT * FROM products 
-        WHERE name LIKE ? 
-        AND category = ?
-        AND price < ?
-    ";
-    
-    return DB::query($query, [
-        '%' . $searchTerm . '%',
-        $category,
-        $maxPrice,
-    ]);
-}
-```
-
-</details>
-
----
-
-## 🚨 Attack #2: Cross-Site Scripting (XSS)
+## 2: Cross-Site Scripting (XSS)
 
 ### How It Works
 
@@ -211,72 +151,7 @@ $allowedHtml = HTMLPurifier::clean($userInput);
 echo $allowedHtml;
 ```
 
----
-
-### 🎯 Practice: Fix the XSS Vulnerabilities
-
-```php
-<!DOCTYPE html>
-<html>
-<head>
-    <title><?= $pageTitle ?></title>
-</head>
-<body>
-    <h1>Search Results for: <?= $_GET['query'] ?></h1>
-    
-    <div class="results">
-        <?php foreach ($results as $product): ?>
-            <div class="product">
-                <h2><?= $product->name ?></h2>
-                <p><?= $product->description ?></p>
-                <a href="/buy?id=<?= $product->id ?>">Buy Now</a>
-            </div>
-        <?php endforeach; ?>
-    </div>
-    
-    <div class="user-comment">
-        <?= $userComment ?>
-    </div>
-</body>
-</html>
-```
-
-<details>
-<summary>🎯 Show answer</summary>
-
-```php
-<!DOCTYPE html>
-<html>
-<head>
-    <title><?= h($pageTitle) ?></title>
-</head>
-<body>
-    <h1>Search Results for: <?= h($_GET['query']) ?></h1>
-    
-    <div class="results">
-        <?php foreach ($results as $product): ?>
-            <div class="product">
-                <h2><?= h($product->name) ?></h2>
-                <p><?= h($product->description) ?></p>
-                <a href="/buy?id=<?= h($product->id) ?>">Buy Now</a>
-            </div>
-        <?php endforeach; ?>
-    </div>
-    
-    <div class="user-comment">
-        <?= h($userComment) ?>
-        <!-- Or if you want to allow some HTML: -->
-        <?= HTMLPurifier::clean($userComment) ?>
-    </div>
-</body>
-</html>
-```
-
-**Rule:** If data came from a user (or database, or API), sanitize it!
-
-</details>
-
----
+--- 
 
 ## ⚠️ PHP Dangerous Functions
 
@@ -301,7 +176,7 @@ create_function($code);
 
 ---
 
-## 🚨 Attack #3: Unvalidated Input
+## 3: Unvalidated Input
 
 ### The Problem
 
@@ -374,6 +249,207 @@ $violations = $validator->validate($user, [
 - ✅ Clear, specific error messages
 - ✅ Validation happens at the boundary
 
+## 4. CSRF Protection
+
+State-changing actions must require CSRF protection to prevent unwanted actions from another site.
+
+### ❌ NEVER Do This
+
+```php
+// No CSRF validation on a state-changing action
+public function updateEmail(Request $request): void {
+    $this->userService->updateEmail(
+        userId: (int) $request->post('user_id'),
+        email: (string) $request->post('email'),
+    );
+}
+```
+
+### ✅ ALWAYS Do This
+
+```php
+public function updateEmail(Request $request): void {
+    $token = (string) $request->post('_csrf');
+
+    if (!$this->csrf->isValid($token)) {
+        throw new SecurityException('Invalid CSRF token');
+    }
+
+    $this->userService->updateEmail(
+        userId: (int) $request->post('user_id'),
+        email: (string) $request->post('email'),
+    );
+}
+```
+
+**Rules:**
+- ✅ Require CSRF token validation on POST/PUT/PATCH/DELETE
+- ✅ Reject requests with missing or invalid tokens
+- ✅ Do not rely on cookies alone for CSRF protection
+
+---
+
+## 5. Fail-Safe Error Handling
+
+Errors should fail closed and avoid leaking internal details.
+
+### ❌ NEVER Do This
+
+```php
+try {
+    $this->invoiceService->create($input);
+} catch (Throwable $e) {
+    echo $e->getMessage(); // Leaks internals to users
+    echo $e->getTraceAsString();
+}
+```
+
+### ✅ ALWAYS Do This
+
+```php
+try {
+    $this->invoiceService->create($input);
+} catch (Throwable $e) {
+    Log::error('Invoice creation failed', [
+        'error' => $e->getMessage(),
+        'exception' => $e::class,
+    ]);
+
+    throw new RuntimeException('Request failed. Please try again.');
+}
+```
+
+**Rules:**
+- ✅ Show generic error messages to users
+- ✅ Log detailed context server-side only
+- ✅ Never expose stack traces, SQL, or file paths in responses
+
+---
+
+## 6. Secure File Uploads
+
+Treat every uploaded file as untrusted input.
+
+### ✅ ALWAYS Do This
+
+```php
+$allowedExtensions = ['jpg', 'png', 'pdf'];
+$maxSizeBytes = 5 * 1024 * 1024;
+
+$originalName = (string) $_FILES['file']['name'];
+$size = (int) $_FILES['file']['size'];
+$ext = strtolower((string) pathinfo($originalName, PATHINFO_EXTENSION));
+
+if (!in_array($ext, $allowedExtensions, true)) {
+    throw new InvalidArgumentException('Invalid file type.');
+}
+
+if ($size <= 0 || $size > $maxSizeBytes) {
+    throw new InvalidArgumentException('Invalid file size.');
+}
+
+$safeName = bin2hex(random_bytes(16)) . '.' . $ext;
+$target = '/var/app/uploads/' . $safeName; // Keep uploads outside webroot
+
+if (!move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
+    throw new RuntimeException('Upload failed.');
+}
+```
+
+**Rules:**
+- ✅ Validate extension and MIME type
+- ✅ Enforce size limits
+- ✅ Generate server-side filenames (never trust user filename)
+- ✅ Store uploads outside webroot when possible
+
+---
+
+## 7. Path Traversal Prevention
+
+Never let user input directly decide which file path is read or written.
+
+### ❌ NEVER Do This
+
+```php
+$path = '/var/app/reports/' . $_GET['file'];
+include $path; // Path traversal risk (../)
+```
+
+### ✅ ALWAYS Do This
+
+```php
+$allowed = [
+    'daily.csv' => '/var/app/reports/daily.csv',
+    'weekly.csv' => '/var/app/reports/weekly.csv',
+];
+
+$key = (string) ($_GET['file'] ?? '');
+if (!isset($allowed[$key])) {
+    throw new InvalidArgumentException('Invalid file key.');
+}
+
+$path = $allowed[$key];
+readfile($path);
+```
+
+**Rules:**
+- ✅ Use allowlists for readable/writable files
+- ✅ Normalize paths and block `..` traversal patterns
+- ✅ Keep file operations constrained to known safe directories
+
+---
+
+## 8. Rate Limiting
+
+Add rate limiting on sensitive operations to reduce brute-force and abuse.
+
+### ✅ ALWAYS Do This
+
+```php
+$limitKey = 'login:' . $request->ip();
+if (!$this->rateLimiter->allow($limitKey, limit: 5, perSeconds: 60)) {
+    throw new RuntimeException('Too many attempts. Try again later.');
+}
+
+$this->authService->login(
+    email: (string) $request->post('email'),
+    password: (string) $request->post('password'),
+);
+```
+
+**Rules:**
+- ✅ Rate limit login, password reset, OTP, and token endpoints
+- ✅ Return clear but generic throttling errors
+- ✅ Log repeated abuse events for investigation
+
+---
+
+## 9. Dependency Hygiene
+
+Keep dependencies updated and remove vulnerable or abandoned packages.
+
+### ✅ ALWAYS Do This
+
+```php
+// composer.json (example policy)
+{
+  "require": {
+    "php": "^8.2"
+  },
+  "scripts": {
+    "security:audit": "composer audit"
+  }
+}
+```
+
+**Rules:**
+- ✅ Run dependency vulnerability scans regularly
+- ✅ Patch critical CVEs quickly
+- ✅ Remove unused dependencies to reduce attack surface
+- ✅ Pin supported major versions and review changelogs before upgrades
+
+---
+
 ## 🎯 The Security Checklist
 
 Before you deploy ANY code that handles user input:
@@ -381,117 +457,39 @@ Before you deploy ANY code that handles user input:
 ### Input Handling
 - [ ] All database queries use parameters (no string concatenation)
 - [ ] All user input is validated (type, length, format)
-- [ ] File uploads check file type and size
+- [ ] File uploads validate type, MIME, filename strategy, and size
 - [ ] Numeric inputs are cast to int/float after validation
+- [ ] Path-based input is validated against allowlisted files/paths
 
 ### Output Handling
 - [ ] All user-generated content is sanitized with `h()`
 - [ ] HTML content is cleaned with a proper library
 - [ ] JSON responses are properly encoded
-- [ ] Error messages don't reveal sensitive info
+- [ ] User-facing errors are generic and do not reveal internals
 
 ### Authentication & Authorization
 - [ ] Passwords are hashed (bcrypt/argon2)
 - [ ] Session IDs are regenerated after login
 - [ ] Authorization checks on EVERY protected action
-- [ ] Rate limiting on login attempts
+- [ ] CSRF protection exists on all state-changing actions
+- [ ] Rate limiting exists on login and other sensitive actions
 
----
-
-## 🚀 Real-World Example: Secure User Registration
-
-### ❌ Insecure Version
-
-```php
-function register() {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    
-    // SQL Injection vulnerability
-    $exists = DB::query("SELECT * FROM users WHERE email = '$email'");
-    
-    if ($exists) {
-        echo "Email already exists!";  // XSS vulnerability
-        return;
-    }
-    
-    // Storing password in plain text! 💀
-    DB::query("INSERT INTO users (email, password) VALUES ('$email', '$password')");
-    
-    echo "Welcome, $email!";  // XSS vulnerability
-}
-```
-
-### ✅ Secure Version
-
-```php
-final class UserRegistrationService
-{
-    public function __construct(
-        private readonly UserRepository $userRepository,
-        private readonly PasswordHasher $passwordHasher,
-        private readonly Validator $validator,
-    ) {}
-    
-    public function register(RegisterUserCommand $command): User
-    {
-        // Validate input
-        $this->validateCommand($command);
-        
-        // Check if user exists (safe query)
-        if ($this->userRepository->existsByEmail($command->email)) {
-            throw new UserAlreadyExistsException();
-        }
-        
-        // Hash password
-        $hashedPassword = $this->passwordHasher->hash($command->password);
-        
-        // Create user (repository handles safe queries)
-        $user = new User(
-            email: $command->email,
-            hashedPassword: $hashedPassword,
-        );
-        
-        DB::transaction(function() use ($user) {
-            $this->userRepository->save($user);
-        });
-        
-        return $user;
-    }
-    
-    private function validateCommand(RegisterUserCommand $command): void
-    {
-        // Validate email
-        if (!filter_var($command->email, FILTER_VALIDATE_EMAIL)) {
-            throw new ValidationException('Invalid email format');
-        }
-        
-        // Validate password strength
-        if (strlen($command->password) < 8) {
-            throw new ValidationException('Password must be at least 8 characters');
-        }
-        
-        if (!preg_match('/[A-Z]/', $command->password)) {
-            throw new ValidationException('Password must contain uppercase letter');
-        }
-        
-        if (!preg_match('/[0-9]/', $command->password)) {
-            throw new ValidationException('Password must contain a number');
-        }
-    }
-}
-
-// In your template (safe output):
-<h1>Welcome, <?= h($user->getEmail()) ?>!</h1>
-```
+### Platform Security
+- [ ] Dangerous PHP functions are disabled in production
+- [ ] Dependencies are scanned for vulnerabilities and updated
 
 ---
 
 ## 📋 Security Quick Reference
 
-| Attack | Defense | Example |
+| Attack / Risk | Defense | Example |
 |--------|---------|---------|
 | SQL Injection | Parameterized queries | `DB::query("SELECT * WHERE id = ?", [$id])` |
 | XSS | Sanitize output with `h()` | `echo h($userInput)` |
 | Bad Input | Validate everything | `filter_var($email, FILTER_VALIDATE_EMAIL)` |
-| Weak Passwords | Hash with bcrypt | `password_hash($pwd, PASSWORD_BCRYPT)` |
+| CSRF | Token validation on state changes | `$this->csrf->isValid($token)` |
+| Error Leakage | Fail-safe generic responses | `throw new RuntimeException('Request failed.')` |
+| Insecure Uploads | Validate + randomize filename | `bin2hex(random_bytes(16))` |
+| Path Traversal | Allowlists + safe directories | `$allowed[$key]` |
+| Brute Force | Endpoint rate limits | `$this->rateLimiter->allow(...)` |
+| Vulnerable Dependencies | Audit and patch regularly | `composer audit` |
