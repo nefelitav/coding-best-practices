@@ -19,3 +19,11 @@ Clean coding practices can also help AI coding assistants like Copilot give bett
 | [Testing](./docs/TESTING.md) |
 | [Security](./docs/SECURITY.md) |
 | [Performance](./docs/PERFORMANCE.md) |
+
+---
+
+## Related Repository
+
+For deeper architecture and design material, also check:
+
+- https://github.com/nefelitav/software-architecture-and-design-best-practices

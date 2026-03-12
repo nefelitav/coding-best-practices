@@ -481,3 +481,11 @@ JOIN customers c ON o.customer_id = c.id;
 | **State Machine** | Invalid state transitions | Model states explicitly |
 | **Enums** | String magic | Type-safe enum values |
 | **Normalization** | Duplicate data | Single source of truth per piece of data |
+
+---
+
+## Related Repository
+
+For deeper architecture and design material, also check:
+
+- https://github.com/nefelitav/software-architecture-and-design-best-practices
