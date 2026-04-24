@@ -1,1 +1,1 @@
-## Join tables on indexed columns to speed up queries.
+## Add indexes strategically to improve query performance. Only include columns that are frequently used in filtering, joining, or sorting operations, and avoid over-indexing columns that provide little benefit. Ensure that columns used in JOIN conditions are indexed on both sides of the relationship to optimize data retrieval speed.
